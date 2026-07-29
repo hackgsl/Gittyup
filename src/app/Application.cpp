@@ -289,6 +289,17 @@ bool Application::restoreWindows() {
     QDir::setCurrent(Settings::appDir().path());
 #endif
 
+#ifdef Q_OS_WIN
+  // When launched from the GUI (double-click, Start menu, Explorer context
+  // menu, etc.) there is no console window attached to this process. In that
+  // case, and when no repository path was passed on the command line, force
+  // the normal mode so the saved session is restored regardless of the
+  // working directory the launcher happened to set. A console-subsystem
+  // launch that explicitly passes a repo path still opens that repo.
+  if (mPositionalArguments.isEmpty() && !GetConsoleWindow())
+    QDir::setCurrent(Settings::appDir().path());
+#endif
+
   QDir dir = QDir::current();
   if (!mPositionalArguments.isEmpty()) {
     // Check for command line repo.
