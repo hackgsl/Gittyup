@@ -296,7 +296,7 @@ bool Application::restoreWindows() {
   // the normal mode so the saved session is restored regardless of the
   // working directory the launcher happened to set. A console-subsystem
   // launch that explicitly passes a repo path still opens that repo.
-  if (mPositionalArguments.isEmpty() && !GetConsoleWindow())
+  if (!GetConsoleWindow())
     QDir::setCurrent(Settings::appDir().path());
 #endif
 
