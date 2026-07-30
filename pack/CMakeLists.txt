@@ -241,7 +241,7 @@ if(APPLE)
 elseif(GITTYUP_PACK_WIN64)
   set(CPACK_GENERATOR NSIS)
   set(CPACK_NSIS_CREATE_ICONS_EXTRA
-      "SetOutPath \\\"$INSTDIR\\\\${CMAKE_INSTALL_BINDIR}\\\"
+      "SetOutPath \\\"$INSTDIR\\\\${CMAKE_INSTALL_BINDIR}\\\" \
       "CreateShortCut \
     \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${GITTYUP_NAME}.lnk\\\" \
     \\\"$INSTDIR\\\\${CMAKE_INSTALL_BINDIR}\\\\${GITTYUP_EXECUTABLE_NAME}.exe\\\""
