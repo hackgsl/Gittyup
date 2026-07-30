@@ -289,38 +289,36 @@ bool Application::restoreWindows() {
     QDir::setCurrent(Settings::appDir().path());
 #endif
 
+  // A repository path passed on the command line (e.g. via the Explorer
+  // "Open with Gittyup" context menu).
+  QString argPath;
+  if (!mPositionalArguments.isEmpty()) {
+    QString arg = mPositionalArguments.first();
+    argPath = QFileInfo(arg).isAbsolute() ? arg : QDir::current().filePath(arg);
+  }
+
 #ifdef Q_OS_WIN
-  // When launched from the GUI (double-click, Start menu, Explorer context
-  // menu, etc.) there is no console window attached to this process. In that
-  // case, and when no repository path was passed on the command line, force
-  // the normal mode so the saved session is restored regardless of the
-  // working directory the launcher happened to set. A console-subsystem
-  // launch that explicitly passes a repo path still opens that repo.
+  // A GUI launch (double-click, Start menu, Explorer "Open with", etc.) has no
+  // console window attached. Treat it as normal mode so the saved session is
+  // restored and saved on exit, regardless of the launcher's working directory
+  // or whether a repo path was passed on the command line. A console-subsystem
+  // launch that explicitly passes a repo path still opens that repo below.
   if (!GetConsoleWindow())
     QDir::setCurrent(Settings::appDir().path());
 #endif
 
-  QDir dir = QDir::current();
-  if (!mPositionalArguments.isEmpty()) {
-    // Check for command line repo.
-    QString arg = mPositionalArguments.first();
-    if (QFileInfo(arg).isAbsolute()) {
-      dir.setPath(arg);
-    } else {
-      dir.cd(arg);
-    }
-  }
-
   // Distinguish two different app modes. The normal mode is entered when the
   // current directory is the same as the app directory (e.g. because the user
-  // launched the app by double-clicking in the GUI). It restores the session
-  // from the last normal mode invocation. Command line mode tries to load a
-  // repository from the current directory. Windows opened in this mode aren't
-  // saved to settings. FIXME: Save subsequently opened windows?
+  // launched the app from the GUI). It restores the session from the last
+  // normal mode invocation. Command line mode tries to load a repository from
+  // the current directory (or the positional argument). Windows opened in this
+  // mode aren't saved to settings. FIXME: Save subsequently opened windows?
 
-  // Load command line arg.
+  // Load command line / current directory repo.
+  QDir dir = QDir::current();
   if (dir != Settings::appDir()) {
-    if (MainWindow *win = MainWindow::open(dir.path(), false)) {
+    QString repo = argPath.isEmpty() ? dir.path() : argPath;
+    if (MainWindow *win = MainWindow::open(repo, false)) {
       win->currentView()->setPathspec(mPathspec);
       return true;
     }
@@ -332,7 +330,18 @@ bool Application::restoreWindows() {
   MainWindow::setSaveWindowSettings(true);
 
   // Restore previous session.
-  return MainWindow::restoreWindows();
+  bool ok = MainWindow::restoreWindows();
+
+  // If a repo was requested (e.g. via "Open with"), open it as an extra tab so
+  // the saved session is preserved instead of being replaced. A non-repo path
+  // (e.g. right-clicking a plain folder like the Desktop) is silently ignored
+  // instead of popping up an "invalid repository" warning.
+  if (!argPath.isEmpty()) {
+    if (MainWindow *win = MainWindow::open(argPath, false))
+      win->currentView()->setPathspec(mPathspec);
+  }
+
+  return ok;
 }
 
 static MainWindow *openOrSwitch(QDir repo) {
