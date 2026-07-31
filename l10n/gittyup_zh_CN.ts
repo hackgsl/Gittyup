@@ -3403,6 +3403,26 @@ Examples
         <translation>工作区文件</translation>
     </message>
     <message>
+        <location filename="../src/ui/DoubleTreeWidget.cpp" line="103"/>
+        <source>Single View</source>
+        <translation>单栏视图</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DoubleTreeWidget.cpp" line="104"/>
+        <source>List View</source>
+        <translation>列表视图</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DoubleTreeWidget.cpp" line="105"/>
+        <source>Multi Column</source>
+        <translation>多列视图</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DoubleTreeWidget.cpp" line="109"/>
+        <source>Hide Untracked Files</source>
+        <translation>隐藏未跟踪文件</translation>
+    </message>
+    <message>
         <location filename="../src/app/Gittyup.cpp" line="27"/>
         <source>Your global GIT configuration is invalid, Gittyup won&apos;t run properly until this is fixed</source>
         <translation>你的全局Git配置无效，修复此问题前Gittyup将无法正常运行</translation>
